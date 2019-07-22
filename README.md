@@ -12,8 +12,8 @@ Installation
 ------------
 1. TP-Link WR1043
 
-- Download and flash the OpenWRT image provided here or 
-- Download the files/ and packages/ directories to your imagbuilder directory: openwrt-imagebuilder-18.06.1-ar71xx-generic.Linux-x86_64, build and flash the iamge to the TP-Link WR1043v5
+- Download and flash the OpenWRT image provided in alarm-ap-XX/ here or 
+- Download the tl-wr0143n-v5 directory contents parallel to your imagebuilder directory: openwrt-imagebuilder-18.06.1-ar71xx-generic.Linux-x86_64, build the image with myMake-v5.sh and flash it to the TP-Link WR1043v5
 - Configure the wireless router router in order to provide a wifi network and have direct access to your WAN and LAN; choose a new SSID for your wifi (it should only be accessed by the Dash buttons and the admin)
 - Connect your smartphone with the new wifi and register the Dash buttons; stop before choosing a product. Take a note of the MAC addresses; if you forget here: by pressing the button, the MAC address is written to /etc/alarm.txt on the configured TP-Link.
 - When you are finished, reconfigure the TP-Link as Access Point behind your actual router and make sure thet the TP-Link is banned by the proper router from accesing the internet (so Amazon is now out of the game). Do not rename the wifi though!
@@ -24,6 +24,7 @@ Installation
 One of the clients has to serve as a central distributor. This client should be in the LAN all the time ar at least be the most reliable node in your LAN. We simply call it CENTRAL here.
 - Install alarm-central_XXX_all.deb:
 <pre>dpkg -i alarm-central_XXX_all.deb || apt-get install -f</pre>
+or build and install alarm-central-XXX_all.deb by yourself
 - Execute as root:
 <pre>alarm-central-postinstallation.sh</pre>
 - Set a password for the user alarm on CENTRAL, so clients can later transfer their ssh keys to CENTRAL.
@@ -35,6 +36,7 @@ One of the clients has to serve as a central distributor. This client should be 
 Clients are the nodes reacting visually and acoustically to alarms. If CENTRAL should do so also, install additionally the client package in CENTRAL.
 - Install alarm-client_XXX_all.deb:
 <pre>dpkg -i alarm-client_XXX_all.deb || apt-get install -f</pre>
+or build and install alarm-client-XXX_all.deb by yourself
 - Execute as root:
 <pre>alarm-postinstallation.sh</pre>
 
