@@ -49,20 +49,20 @@ The configuration file is located in /etc/alarm/alarm_ap.conf.
 
 2. CENTRAL
 - /etc/alarm/alarm_global_central.conf
--- Contains default definitions to be distributed to all clients. The buttons are identified by the names given in ALARM_MAC if
+Contains default definitions to be distributed to all clients. The buttons are identified by the names given in ALARM_MAC if
 the AP config file. The most important definitions here are
---- ALARM['DESCRIPTION','<buttonname>']: This should be the location of the Dash button when being pressed. This description is being displayed in the visual alarm.
---- ALARM['AUDIO','<buttonname>']: The name of the audio file in /usr/share/alarm/audio/ being used for the alarm
---- ALARM['AUDIO_VOLUME','<buttonname>']: ranges from 1 to 3
---- ALARM['VIDEO','<buttonname>']: "fullscreen", "normal" or "" 
---- ALARM['IP','<buttonname>']: IP addresses of clients in the room of the Dash button. If the alarm is triggered, these clients will not react to the alarm and instead be able to give the all-clear signal on the triggered alarm. If you want to separate these features, do noet set 'IP' but:
---- ALARM['NOALARM','<buttonname>']: IP addresses of clients which should not react to the alarm.
---- ALARM['ALLCLEAR','<buttonname>']: IP addresses of clients which are permitted to give the all-clear on the alarm.
+    - ALARM['DESCRIPTION','<buttonname>']: This should be the location of the Dash button when being pressed. This description is being displayed in the visual alarm.
+    - ALARM['AUDIO','<buttonname>']: The name of the audio file in /usr/share/alarm/audio/ being used for the alarm
+    - ALARM['AUDIO_VOLUME','<buttonname>']: ranges from 1 to 3
+    - ALARM['VIDEO','<buttonname>']: "fullscreen", "normal" or "" 
+    - ALARM['IP','<buttonname>']: IP addresses of clients in the room of the Dash button. If the alarm is triggered, these clients will not react to the alarm and instead be able to give the all-clear signal on the triggered alarm. If you want to separate these features, do noet set 'IP' but:
+    - ALARM['NOALARM','<buttonname>']: IP addresses of clients which should not react to the alarm.
+    - ALARM['ALLCLEAR','<buttonname>']: IP addresses of clients which are permitted to give the all-clear on the alarm.
 
 The settings on 'Default' insted of '<buttonname>' apply to all buttons. Changes on individual buttons should be stated in the last paragraph of the config file.
   
  3. Clients
  - /etc/alarm/alarm_local.conf
- -- You can edit this local config file in largely the same way as described for the global config file on CENTRAL. However, you can also use a graphical tool.
+You can edit this local config file in largely the same way as described for the global config file on CENTRAL. However, you can also use a graphical tool.
  - The graphical tool
- -- Browse to System/Control Center/Personal/Alarm Notification Configurator and use the tool. You can edit the behaviour of the Default or any individual button permanently on the client or for just this session; after the next reboot, the session settings are reset.
+Browse to System/Control Center/Personal/Alarm Notification Configurator and use the tool. You can edit the behaviour of the Default or any individual button permanently on the client or for just this session; after the next reboot, the session settings are reset.
