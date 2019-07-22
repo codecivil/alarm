@@ -15,7 +15,7 @@ Installation
 - Download and flash the OpenWRT image provided in alarm-ap-XX/ OR 
 - Download the tl-wr0143n-v5 directory contents parallel to your imagebuilder directory: openwrt-imagebuilder-18.06.1-ar71xx-generic.Linux-x86_64, build the image with myMake-v5.sh and flash it to the TP-Link WR1043v5
 - Configure the wireless router router in order to provide a wifi network and have direct access to your WAN and LAN; choose a new SSID for your wifi (it should only be accessed by the Dash buttons and the admin)
-- Connect your smartphone with the new wifi and register the Dash buttons; stop before choosing a product. Take a note of the MAC addresses; if you forget here: by pressing the button, the MAC address is written to /etc/alarm.txt on the configured TP-Link.
+- Connect your smartphone with the new wifi and register the Dash buttons; stop before choosing a product. Take a note of the MAC addresses.
 - When you are finished, reconfigure the TP-Link as Access Point behind your actual router and make sure thet the TP-Link is banned by the proper router from accesing the internet (so Amazon is now out of the game). Do not rename the wifi though!
 - Configure the Access Point (see "Configuration"): ssh to the TP-Link and edit /etc/alarm/alarm_ap.conf
 
