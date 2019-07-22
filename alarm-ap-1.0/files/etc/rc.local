@@ -1,0 +1,12 @@
+# Put your custom commands here that should be executed once
+# the system init finished. By default this file does nothing.
+
+# react with script 'detect_alarm' on connections/disconnections to wlan0
+# seems to take a bit until hostapd is running
+# automatic restart if hostapd_cli suddenly exits
+sleep 30
+while true; do
+	pgrep hostapd_cli || hostapd_cli -a /usr/bin/detect_alarm.sh -i wlan0 -B /var/run/hostapd-phy0.conf
+	sleep 30
+done &
+exit 0
