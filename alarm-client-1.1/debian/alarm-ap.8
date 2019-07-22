@@ -1,0 +1,40 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" (C) Copyright 2017 Marco Kühnel <kuehnel@codecivil.de>,
+.\"
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH SEUSB2 8 "September 17, 2018"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+alarm-ap \- distribution of connection triggered alarms
+.SH SYNOPSIS
+.B alarm_configurator
+
+.SH DESCRIPTION
+This manual page documents briefly the
+.B alarm-ap
+package.
+.PP
+.\" TeX users may be more comfortable with the \fB<whatever>\fP and
+.\" \fI<whatever>\fP esTcape sequences to invode bold face and GFitalics,
+.\" respectively.
+\fBalarm-ap\fP is an OpenWrt package for Access Points. Connection of 
+designated devices (e.g. Dash buttons) trigger the distribution of an alarm
+to designated targets. The targets need alarm-client to have installed. 
+For details of the installation please consult my GitHub 
+section.
+.SH SEE ALSO
+.BR alarm-client (8).
+

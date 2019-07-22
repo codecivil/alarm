@@ -1,0 +1,9 @@
+alarm_client.sh /usr/bin
+alarm_configurator.sh /usr/bin
+alarm-postinstall.sh /usr/bin
+alarmd.desktop /usr/share/alarm
+alarm_configurator.desktop /usr/share/applications
+alarmd.sh /usr/bin
+alarm_global.conf /etc/alarm
+alarm_local.conf /etc/alarm
+audio/* /usr/share/alarm/audio
