@@ -1,0 +1,10 @@
+[Unit]
+Description=FastResponseDaemon for CENTRAL
+
+[Service]
+User=alarm
+ExecStart=/usr/bin/alarmd_central.sh
+StandardOutput=syslog
+
+[Install]
+WantedBy=default.target

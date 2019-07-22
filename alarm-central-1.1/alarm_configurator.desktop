@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Alarm Notification Configurator
+GenericName=Alarmbenachrichtigungen konfigurieren
+Exec=/usr/bin/alarm_configurator.sh
+Terminal=false
+Type=Application
+Icon=applications-system
+Categories=Settings;X-GNOME-PersonalSettings;
+

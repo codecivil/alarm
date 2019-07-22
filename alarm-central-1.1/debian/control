@@ -1,0 +1,15 @@
+Source: alarm-central
+Section: unknown
+Priority: optional
+Maintainer: Marco Kühnel <kuehnel@codecivil.de>
+Build-Depends: debhelper (>= 10)
+Standards-Version: 4.0.0
+Homepage: https://www2.codecivil.de
+#Vcs-Git: git://anonscm.debian.org/collab-maint/alarm-clinet.git
+#Vcs-Browser: http://anonscm.debian.org/?p=collab-maint/alarm-client.git;a=summary
+
+Package: alarm-central
+Architecture: all
+Depends: ${misc:Depends}, pssh, inotify-tools
+Description: This is the package for the central server.
+ It only distributes alarms and does so as daemon withpout requiring a login.
