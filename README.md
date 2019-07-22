@@ -15,7 +15,7 @@ Installation
 - Download and flash the OpenWRT image provided here or 
 - Download the files/ and packages/ directories to your imagbuilder directory: openwrt-imagebuilder-18.06.1-ar71xx-generic.Linux-x86_64, build and flash the iamge to the TP-Link WR1043v5
 - Configure the wireless router router in order to provide a wifi network and have direct access to your WAN and LAN; choose a new SSID for your wifi (it should only be accessed by the Dash buttons and the admin)
-- Connect your smartphone with the new wifi and register the Dash buttons; stop before choosing a product. 
+- Connect your smartphone with the new wifi and register the Dash buttons; stop before choosing a product. Take a note of the MAC addresses; if you forget here: by pressing the button, the MAC address is written to /etc/alarm.txt on the configured TP-Link.
 - When you are finished, reconfigure the TP-Link as Access Point behind your actual router and make sure thet the TP-Link is banned by the proper router from accesing the internet (so Amazon is now out of the game). Do not rename the wifi though!
 - Configure the Access Point (see "Configuration"): ssh to the TP-Link and edit /etc/alarm/alarm_ap.conf
 
