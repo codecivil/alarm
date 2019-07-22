@@ -51,6 +51,8 @@ The configuration file is located in /etc/alarm/alarm_ap.conf.
 
 2. CENTRAL
 - /etc/alarm/alarm_global_central.conf
+The contents are copied to /etc/alarm/alarm_central.conf by alarm-central-postinstall.sh. So either you edit this file before executung alarm-central-postinstall.sh or you simply edit /etc/alarm/alarm_global.conf.
+- /etc/alarm/alarm_global.conf
 Contains default definitions to be distributed to all clients. The buttons are identified by the names given in ALARM_MAC if
 the AP config file. The most important definitions here are
     - ALARM['DESCRIPTION','<buttonname>']: This should be the location of the Dash button when being pressed. This description is being displayed in the visual alarm.
