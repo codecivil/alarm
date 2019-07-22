@@ -5,7 +5,7 @@ What you need
 -------------
 - Amazon Dash buttons to trigger the alarms
 - Smartphone with Amazon App in order to register the Dash buttons
-- TP-Link WR1043v5 wireless router, or any other version of you want to buidl the image by yourself
+- TP-Link WR1043v5 wireless router, or any other version of you want to build the image by yourself
 - Linux clients for displaying the alarms, Debian bases distributions if you want to install the binary package
 
 Installation
