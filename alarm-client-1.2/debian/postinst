@@ -46,7 +46,7 @@ case "$1" in
 			cp -a /usr/share/alarm/alarmd.desktop $_HOME/.config/autostart/
 			[ -f $_HOME/.ssh/id_rsa.pub ] || su $_USER -c 'ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa' && cat $_HOME/.ssh/id_rsa.pub >> /home/alarm/.ssh/authorized_keys
 			# add localhost to known hosts of every user
-			su $_USER -c "ssh -o StrictHostKeyChecking=no alarm@localhost 'exit'"
+			su $_USER -c "ssh -o StrictHostKeyChecking=no alarm@127.0.0.1 'exit'"
 			usermod -aG alarm $_USER
 		done
 

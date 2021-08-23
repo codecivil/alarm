@@ -1,9 +1,35 @@
 #!/bin/bash
-#alarm-postinstall.sh
+#alarm-postinstall.sh [-n|--network NETWORK] [-p|--password PASSWORD] [-c|--central CENTRAL] [-y|--yes]
 #configures most important network settings
+
+function parseArgs() {
+	while [[ "$@" != '' ]]; do
+		case "$1" in
+			"-n"|"--network")
+				shift
+				_network="$1"
+				;;
+			"-p"|"--password")
+				shift
+				_password="$1"
+				;;
+			"-c"|"--central")
+				shift
+				_central="$1"
+				;;
+			"-y"|"--yes")
+				_yes=true
+				;;
+		esac
+		shift
+	done
+}
+
+parseArgs $@
 
 _default_network="$(ip addr | grep 'inet ' | awk '{printf "%s\n",$2 }' | sort | tail -n1)"
 _default_network="${_default_network%.*}"
+if $_yes; then 	[[ "$_network" == "" ]] && _network="$_default_network"; fi
 while [[ "$_network" != *.*.* ]]; do 
 	echo -n "Your network [$_default_network]: "; read _network; 
 	[[ "$_network" == "" ]] && _network="$_default_network"	
@@ -26,8 +52,11 @@ declare -A ALARM
 . /etc/alarm/alarm_global.conf
 
 #allow passwordless login to alarm@CENTRAL for every user
-cat /home/alarm/.ssh/authorized_keys | ssh alarm@${ALARM['NETWORK']}${ALARM['CENTRAL']} 'cat >> .ssh/authorized_keys'
-
+if [[ "$_password" != "" ]]; then
+	cat /home/alarm/.ssh/authorized_keys | SSHPASS="$_password" sshpass -e ssh -o StrictHostKeyChecking=no alarm@${ALARM['NETWORK']}${ALARM['CENTRAL']} 'cat >> .ssh/authorized_keys'
+else
+	cat /home/alarm/.ssh/authorized_keys | ssh alarm@${ALARM['NETWORK']}${ALARM['CENTRAL']} 'cat >> .ssh/authorized_keys'
+fi
 # add alarm@CENTRAL to known hosts of every user
 for _USER in $(ls /home); do
 	su $_USER -c "ssh -o StrictHostKeyChecking=no alarm@${ALARM['NETWORK']}${ALARM['CENTRAL']} 'exit'"

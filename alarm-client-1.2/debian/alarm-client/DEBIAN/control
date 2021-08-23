@@ -1,16 +1,12 @@
-Source: alarm-client
+Package: alarm-client
+Version: 1.2-1
+Architecture: all
+Maintainer: Marco Kühnel <kuehnel@codecivil.de>
+Installed-Size: 692
+Depends: yad, pssh, inotify-tools, ffmpeg, sshpass
 Section: unknown
 Priority: optional
-Maintainer: Marco Kühnel <kuehnel@codecivil.de>
-Build-Depends: debhelper (>= 10)
-Standards-Version: 4.0.0
 Homepage: https://www2.codecivil.de
-#Vcs-Git: git://anonscm.debian.org/collab-maint/alarm-clinet.git
-#Vcs-Browser: http://anonscm.debian.org/?p=collab-maint/alarm-client.git;a=summary
-
-Package: alarm-client
-Architecture: all
-Depends: ${misc:Depends}, yad, pssh, inotify-tools, ffmpeg
 Description: Notifies about emergency alarms and distributes them
  The package provides a system to be notified by alarm set of by Dash buttons
  and distributed by a properly configured AP (see alarm-ap package). For faster

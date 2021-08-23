@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Alarm notification serivce
+GenericName=Alarmbenachrichtigungen
+Exec=/usr/bin/alarmd.sh
+Terminal=false
+Type=Application
+X-GNOME-Autostart-enabled=true

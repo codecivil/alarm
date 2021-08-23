@@ -1,10 +1,12 @@
 #!/bin/bash
 declare -A ALARM
 
-# get global config from CENTRAL
-
 . /etc/alarm/alarm_global.conf
 
+# do not start until local network is available
+while ! ping -c1 ${ALARM['NETWORK']}${ALARM['CENTRAL']}; do sleep 10; done
+
+# get global config from CENTRAL
 scp alarm@${ALARM['NETWORK']}${ALARM['CENTRAL']}:/etc/alarm/alarm_global.conf /etc/alarm/
 
 . /etc/alarm/alarm_global.conf
