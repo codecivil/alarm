@@ -1,0 +1,98 @@
+# Automatically added by dh_systemd_enable/13.3.4
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
+	# This will only remove masks created by d-s-h on package removal.
+	deb-systemd-helper unmask 'alarm_authlog.service' >/dev/null || true
+
+	# was-enabled defaults to true, so new installations run enable.
+	if deb-systemd-helper --quiet was-enabled 'alarm_authlog.service'; then
+		# Enables the unit on first installation, creates new
+		# symlinks on upgrades if the unit file has changed.
+		deb-systemd-helper enable 'alarm_authlog.service' >/dev/null || true
+	else
+		# Update the statefile to add new symlinks (if any), which need to be
+		# cleaned up on purge. Also remove old symlinks.
+		deb-systemd-helper update-state 'alarm_authlog.service' >/dev/null || true
+	fi
+fi
+# End automatically added section
+# Automatically added by dh_systemd_enable/13.3.4
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
+	# This will only remove masks created by d-s-h on package removal.
+	deb-systemd-helper unmask 'alarm_authlog.timer' >/dev/null || true
+
+	# was-enabled defaults to true, so new installations run enable.
+	if deb-systemd-helper --quiet was-enabled 'alarm_authlog.timer'; then
+		# Enables the unit on first installation, creates new
+		# symlinks on upgrades if the unit file has changed.
+		deb-systemd-helper enable 'alarm_authlog.timer' >/dev/null || true
+	else
+		# Update the statefile to add new symlinks (if any), which need to be
+		# cleaned up on purge. Also remove old symlinks.
+		deb-systemd-helper update-state 'alarm_authlog.timer' >/dev/null || true
+	fi
+fi
+# End automatically added section
+# Automatically added by dh_systemd_enable/13.3.4
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
+	# This will only remove masks created by d-s-h on package removal.
+	deb-systemd-helper unmask 'alarm_cleanup.service' >/dev/null || true
+
+	# was-enabled defaults to true, so new installations run enable.
+	if deb-systemd-helper --quiet was-enabled 'alarm_cleanup.service'; then
+		# Enables the unit on first installation, creates new
+		# symlinks on upgrades if the unit file has changed.
+		deb-systemd-helper enable 'alarm_cleanup.service' >/dev/null || true
+	else
+		# Update the statefile to add new symlinks (if any), which need to be
+		# cleaned up on purge. Also remove old symlinks.
+		deb-systemd-helper update-state 'alarm_cleanup.service' >/dev/null || true
+	fi
+fi
+# End automatically added section
+# Automatically added by dh_systemd_enable/13.3.4
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
+	# This will only remove masks created by d-s-h on package removal.
+	deb-systemd-helper unmask 'alarm_cleanup.timer' >/dev/null || true
+
+	# was-enabled defaults to true, so new installations run enable.
+	if deb-systemd-helper --quiet was-enabled 'alarm_cleanup.timer'; then
+		# Enables the unit on first installation, creates new
+		# symlinks on upgrades if the unit file has changed.
+		deb-systemd-helper enable 'alarm_cleanup.timer' >/dev/null || true
+	else
+		# Update the statefile to add new symlinks (if any), which need to be
+		# cleaned up on purge. Also remove old symlinks.
+		deb-systemd-helper update-state 'alarm_cleanup.timer' >/dev/null || true
+	fi
+fi
+# End automatically added section
+# Automatically added by dh_systemd_enable/13.3.4
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
+	# This will only remove masks created by d-s-h on package removal.
+	deb-systemd-helper unmask 'alarmd.service' >/dev/null || true
+
+	# was-enabled defaults to true, so new installations run enable.
+	if deb-systemd-helper --quiet was-enabled 'alarmd.service'; then
+		# Enables the unit on first installation, creates new
+		# symlinks on upgrades if the unit file has changed.
+		deb-systemd-helper enable 'alarmd.service' >/dev/null || true
+	else
+		# Update the statefile to add new symlinks (if any), which need to be
+		# cleaned up on purge. Also remove old symlinks.
+		deb-systemd-helper update-state 'alarmd.service' >/dev/null || true
+	fi
+fi
+# End automatically added section
+# Automatically added by dh_systemd_start/13.3.4
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
+	if [ -d /run/systemd/system ]; then
+		systemctl --system daemon-reload >/dev/null || true
+		if [ -n "$2" ]; then
+			_dh_action=restart
+		else
+			_dh_action=start
+		fi
+		deb-systemd-invoke $_dh_action 'alarm_authlog.service' 'alarm_authlog.timer' 'alarm_cleanup.service' 'alarm_cleanup.timer' 'alarmd.service' >/dev/null || true
+	fi
+fi
+# End automatically added section

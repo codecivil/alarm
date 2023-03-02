@@ -1,0 +1,12 @@
+./alarm_central.sh
+./alarm-central-postinstall.sh
+./alarmd_central.sh
+./alarm_authlog.sh
+./alarm_cleanup.sh
+./alarm_global_central.conf
+./alarm_local_central.conf
+./alarmd.service
+./alarm_authlog.service
+./alarm_cleanup.service
+./alarm_authlog.timer
+./alarm_cleanup.timer

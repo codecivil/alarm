@@ -1,6 +1,0 @@
-alarm_central.sh /usr/bin
-alarm-central-postinstall.sh /usr/bin
-alarmd_central.sh /usr/bin
-alarm_global_central.conf /etc/alarm
-alarm_local_central.conf /etc/alarm
-alarmd.service /lib/systemd/system

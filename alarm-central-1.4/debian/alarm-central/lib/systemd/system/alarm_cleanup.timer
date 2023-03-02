@@ -1,0 +1,10 @@
+[Unit]
+Description=Clean up client's installation clutter once a day
+Requires=alarm_cleanup.service
+
+[Timer]
+Unit=alarm_cleanup.service
+OnCalendar=*-*-* 00:27:27
+
+[Install]
+WantedBy=timers.target

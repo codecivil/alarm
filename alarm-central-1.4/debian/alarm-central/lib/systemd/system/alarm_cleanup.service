@@ -1,0 +1,9 @@
+[Unit]
+Description=Clean up clutter from client installations
+
+[Service]
+User=alarm
+ExecStart=/usr/bin/alarm_cleanup.sh
+
+[Install]
+WantedBy=default.target

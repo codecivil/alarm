@@ -1,0 +1,10 @@
+[Unit]
+Description=Make auth logs available to alarm once a day
+Requires=alarm_authlog.service
+
+[Timer]
+Unit=alarm_authlog.service
+OnCalendar=*-*-* 00:22:22
+
+[Install]
+WantedBy=timers.target

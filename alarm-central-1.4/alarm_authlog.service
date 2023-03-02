@@ -1,0 +1,8 @@
+[Unit]
+Description=Prvide auth.log public keys for alarm-central
+
+[Service]
+ExecStart=/usr/bin/alarm_authlog.sh
+
+[Install]
+WantedBy=default.target

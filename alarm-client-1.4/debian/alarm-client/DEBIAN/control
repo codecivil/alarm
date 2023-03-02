@@ -1,0 +1,14 @@
+Package: alarm-client
+Version: 1.4-5
+Architecture: all
+Maintainer: Marco Kühnel <kuehnel@codecivil.de>
+Installed-Size: 841
+Depends: yad, pssh, inotify-tools, ffmpeg, sshpass
+Section: unknown
+Priority: optional
+Homepage: https://www2.codecivil.de
+Description: Notifies about emergency alarms and distributes them
+ The package provides a system to be notified by alarm set of by Dash buttons
+ and distributed by a properly configured AP (see alarm-ap package). For faster
+ notification, the client helps distributing the alarm in the network. There is
+ a tool for the local configuration.
