@@ -1,6 +1,17 @@
 # alarm
 Linux based fast response system relying on myStrom buttons
 
+How it works
+------------
+
+Push a myStrom button and all connected Linux computers receive a visual and accoustic signal. In usual setups the signal should not run longer than 10s before
+arriving at the computers. The signal can be cancelled by selected machines (configurable). The scripts are tuned to fast signal transportation (building a mesh, parallel-ssh, inotify) while using widely available infrastructure (WLAN).
+
+Known Issues
+------------
+Notifications cannot be listed or cancelled in GNOME. Works best with MATE.
+
+
 What you need
 -------------
 - myStrom simple wifi buttons to trigger the alarms (there is no adapted firmware for the plus buttons yet)
