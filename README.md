@@ -12,7 +12,7 @@ Installation
 1. TP-Link WR1043
 
 	- Download and flash the appropriate OpenWRT image provided in res/ OR 
-	- Download the tl-wr0143nd-v2 directory contents parallel to your imagebuilder directory: openwrt-imagebuilder-18.06.1-ar71xx-generic.Linux-x86_64, build the image with myMake-v5.sh and flash it to the TP-Link WR1043v5
+	- Download the tl-wr0143nd-v2 directory contents parallel to your imagebuilder directory: openwrt-imagebuilder-21.02.3-ath79-generic.Linux-x86_64, build the image with myMake-v5.sh and flash it to the TP-Link WR1043v5
 	- Connect the AP to your LAN (preferably by cable)
 	- Create an interface ALARM
 	- Connect it to a wlan (<ALARM-WLANNAME> for later reference), but disconnect from everything else (no lan or internet over this WLAN!)
