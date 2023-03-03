@@ -68,7 +68,7 @@ You can build the deb-package from source or install it from the codecivil repo:
 
 		`wget -O - https://www2.codecivil.de/apt/apt\@codecivil.de.pub.asc | apt-key add`
 
-	- Install alarm-client_XXX_all.deb:
+	- Install alarm-central:
 
 		`apt update`
 
@@ -97,7 +97,7 @@ You can build the deb-package from source or install it from the codecivil repo:
 
 		`wget -O - https://www2.codecivil.de/apt/apt\@codecivil.de.pub.asc | apt-key add`
 
-	- Install alarm-client_XXX_all.deb:
+	- Install alarm-client:
 		
         `apt update`
 
@@ -113,9 +113,10 @@ Configuration
 1. AP
 
     The configuration file is located in /etc/alarm/alarm_ap.conf. 
-* ALARM_NETWORK: the first three octets of your lan; sorry, no other subnet masks supported at this time. End with a dot.
-* ALARM_MAC: identify the mac addresses of your buttons with a human readable name. The identification with a location occurs later when configuring CENTRAL.
-* ALARM_TARGETS: list of last octet of the local IP of the alarm clients, including CENTRAL, but excluding AP.
+
+    * ALARM_NETWORK: the first three octets of your lan; sorry, no other subnet masks supported at this time. End with a dot.
+    * ALARM_MAC: identify the mac addresses of your buttons with a human readable name. The identification with a location occurs later when configuring CENTRAL.
+    * ALARM_TARGETS: list of last octet of the local IP of the alarm clients, including CENTRAL, but excluding AP.
 
 2. CENTRAL
 
@@ -148,7 +149,7 @@ a common configuration file.
         
         - ALARM['ALLCLEAR','buttonname']: IP addresses of clients which are permitted to give the all-clear on the alarm.
 
-    The settings on 'Default' instead of 'buttonname' apply to all buttons. Changes on individual buttons should be stated in the last paragraph of the config file.
+        The settings on 'Default' instead of 'buttonname' apply to all buttons. Changes on individual buttons should be stated in the last paragraph of the config file.
   
  3. Clients
 
