@@ -76,7 +76,7 @@ You can build the deb-package from source or install it from the codecivil repo:
 
 	- After installation, execute as root:
 	
-	    `alarm-central-postinstallation.sh`
+	    `alarm-central-postinstall.sh`
 
 	- Set a password for the user alarm on CENTRAL, so clients can later transfer their ssh keys to CENTRAL.
 	- Start and enable alarmd as daemon on CENTRAL.
@@ -105,7 +105,7 @@ You can build the deb-package from source or install it from the codecivil repo:
 
 	- After installation, execute as root:
 	
-        `alarm-postinstallation.sh`
+        `alarm-postinstall.sh`
 
 Configuration
 =============
