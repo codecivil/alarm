@@ -1,3 +1,11 @@
+alarm-client (1.4-6) UNRELEASED; urgency=low
+
+  [ Marco Kühnel ]
+  * alarmd.sh: renamed alarm.USER.lock to lock.USER.alarm in order
+    to prevent confusion with a real alarm file
+
+ -- Marco Kühnel <kuehnel@codecivil.de>  Fri, 03 Mar 2023 16:00:00 +0100
+
 alarm-client (1.4-5) UNRELEASED; urgency=low
 
   [ Marco Kühnel ]

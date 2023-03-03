@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # do not start twice (just to be safe)
-[[ -f /tmp/alarm.$(whoami).lock ]] && ps --pid $(cat /tmp/alarm.$(whoami).lock) && exit 0
-touch /tmp/alarm.$(whoami).lock
+[[ -f /tmp/lock.$(whoami).alarm ]] && ps --pid $(cat /tmp/lock.$(whoami).alarm) && exit 0
+touch /tmp/lock.$(whoami).alarm
 
 [ -d $HOME/.config/alarm ] || mkdir -p $HOME/.config/alarm
 touch $HOME/.config/alarm/alarm_user.conf
@@ -52,7 +52,7 @@ inotifywait -m -e create,delete /tmp | {
 		[[ "$_FILE" == "alarm."* ]] && /usr/bin/alarm_client.sh $_ACTION "$_FILE"
 	done
 } &
-echo "$!" > /tmp/alarm.$(whoami).lock #preserve PID of inotify...
+echo "$!" > /tmp/lock.$(whoami).alarm #preserve PID of inotify...
 
 # get current alarms from CENTRAL
 

@@ -1,7 +1,7 @@
 6884f5f7433241315047e25b6e8eb871  usr/bin/alarm-postinstall.sh
 26a691772e6624bcaf5388e04a2004fb  usr/bin/alarm_client.sh
 ad8f484c38cefd881f05708a09c2fcee  usr/bin/alarm_configurator.sh
-07c90f83e2185778f52248df0fb537ec  usr/bin/alarmd.sh
+df8ed2aa6c4dbd8894d6e5858f316cea  usr/bin/alarmd.sh
 c7928433b3d73d5fe0486fd101036337  usr/share/alarm/alarmd.desktop
 86105097fbfd6d015f052ef0f410f4ae  usr/share/alarm/audio/Autohupe.mp3
 ccc85b3de48ca6841015b3776e39fc33  usr/share/alarm/audio/EinTon_schnell.mp3
@@ -21,5 +21,5 @@ d00034ae3293f898c465765640032463  usr/share/alarm/audio/Pferd.mp3
 d216301e227fcf17308c4d23e4a86b67  usr/share/alarm/audio/Vogelähnlich.mp3
 a7d407234a7e3b64c93767e0b13992db  usr/share/alarm/audio/message.mp3
 1f9e75f0673e340c9783b2b29676df7e  usr/share/applications/alarm_configurator.desktop
-230b6167ae5fa467c4ffcc0f093a149b  usr/share/doc/alarm-client/changelog.Debian.gz
+7d2a4c9fff56bc4e3e1547c661a5ebc1  usr/share/doc/alarm-client/changelog.Debian.gz
 57129097e8666238517757f25ac0c618  usr/share/doc/alarm-client/copyright
