@@ -5,7 +5,7 @@ What you need
 -------------
 - myStrom simple wifi buttons to trigger the alarms (there is no adapted firmware for the plus buttons yet)
 - TP-Link WR1043v2 wireless router, or any other version of you want to build the image by yourself
-- Linux clients for displaying the alarms, Debian bases distributions if you want to install the binary package
+- Linux clients for displaying the alarms, Debian based distributions if you want to install the binary package
 
 Installation
 ------------
@@ -55,7 +55,7 @@ Installation
  
 3. CENTRAL
 
-    One of the clients has to serve as a central distributor. This client should be in the LAN all the time ar at least be the most reliable node in your LAN. We simply call it CENTRAL here.
+    One of the clients has to serve as a central distributor. This client should be in the LAN all the time or at least be the most reliable node in your LAN. We simply call it CENTRAL here.
 You can build the deb-package from source or install it from the codecivil repo:
 
 	- Add codeicivil repo to client:
