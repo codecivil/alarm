@@ -16,10 +16,12 @@ _networkdown=true
 while $_networkdown; do
 	_nohit=true
 	for _central in ${ALARM['CENTRAL']} ${ALARM['CENTRAL_ALT']}; do
-		if echo $_central | grep '\.'; then
-			ping -c1 $_central && { ALARM['CENTRAL']="$_central"; _networkdown=false; _nohit=false; }
-		else 
-			ping -c1 ${ALARM['NETWORK']}$_central && { ALARM['CENTRAL']="${ALARM['NETWORK']}$_central"; _networkdown=false; _nohit=false; }
+		if $_nohit; then
+			if echo $_central | grep '\.'; then
+				ping -c1 $_central && { ALARM['CENTRAL']="$_central"; _networkdown=false; _nohit=false; }
+			else 
+				ping -c1 ${ALARM['NETWORK']}$_central && { ALARM['CENTRAL']="${ALARM['NETWORK']}$_central"; _networkdown=false; _nohit=false; }
+			fi
 		fi
 	done
 	$_nohit && sleep 10

@@ -35,7 +35,7 @@ while [[ "$_network" != *.*.* ]]; do
 	echo -n "Your network [$_default_network]: "; read _network; 
 	[[ "$_network" == "" ]] && _network="$_default_network"	
 done
-while [[ 0 -ge "$_central" ]]; do echo -n "Last octet of alarm CENTRAL (most reliably accessible node): "; read _central; done
+while [[ 0 -ge "$_central" ]]; do echo -n "Last octet or full IPs address of alarm CENTRALs (most reliably accessible nodes): "; read _central; done
 
 sed -i "s/^ALARM\['CENTRAL'\]=[^ #]*/ALARM\['CENTRAL'\]=\"$_central\"/g;s/^ALARM\['NETWORK'\]=[^ #]*/ALARM\['NETWORK'\]=\"$_network\.\"/g;" /etc/alarm/alarm_global.conf
 chmod 660 /etc/alarm/alarm_global.conf
@@ -46,11 +46,25 @@ declare -A ALARM
 . /etc/alarm/alarm_global.conf
 
 #allow passwordless login to alarm@CENTRAL for every user and clean up authorized key file on CENTRAL
-if [[ "$_password" != "" ]]; then
-	cat /home/alarm/.ssh/authorized_keys | SSHPASS="$_password" sshpass -e ssh -o StrictHostKeyChecking=no alarm@${ALARM['NETWORK']}${ALARM['CENTRAL']} 'cat >> .ssh/authorized_keys && /usr/bin/alarm_cleanup.sh'
-else
-	cat /home/alarm/.ssh/authorized_keys | ssh alarm@${ALARM['NETWORK']}${ALARM['CENTRAL']} 'cat >> .ssh/authorized_keys && /usr/bin/alarm_cleanup.sh 2>/dev/null || echo "Error: package alarm-central is not (properly) installed on CENTRAL"'
-fi
+for _central in ${ALARM['CENTRAL']} ${ALARM['CENTRAL_ALT']}; do
+	if echo $_central | grep -v '\.' >/dev/null; then _central="${ALARM['NETWORK']}$_central"; fi
+	if [[ "$_password" != "" ]]; then
+		cat /home/alarm/.ssh/authorized_keys | SSHPASS="$_password" sshpass -e ssh -o StrictHostKeyChecking=no alarm@"$_central" 'cat >> .ssh/authorized_keys && /usr/bin/alarm_cleanup.sh'
+	else
+		cat /home/alarm/.ssh/authorized_keys | ssh alarm@"$_central" 'cat >> .ssh/authorized_keys && /usr/bin/alarm_cleanup.sh 2>/dev/null || echo "Error: package alarm-central is not (properly) installed on CENTRAL"'
+	fi
+	# get and read global conf
+	su alarm -c "scp alarm@$_central:/etc/alarm/alarm_global.conf /etc/alarm/"
+	. /etc/alarm/alarm_global.conf
+	# auto registration: add local IP to the ALL value in alarm_global.conf if not yet there
+	ALARM['MYIP']="$(ip -4 addr | grep "inet ${ALARM['NETWORK']}" | awk '{print $2; } ' | sed "s/\/.*//; s/${ALARM['NETWORK']}//" | head -n1 )"
+	if [[ "${ALARM['ALL']}" != *" ${ALARM['MYIP']}"* ]] && [[ "${ALARM['ALL']}" != *"${ALARM['MYIP']} "* ]]; then
+		su alarm -c "ssh alarm@$_central cp /etc/alarm/alarm_global.conf /etc/alarm/alarm_global_$(date +%s).conf" #backup old global conf
+		su alarm -c "ssh alarm@$_central 'sed -i '\"'\"'s/\(ALARM.*ALL.*=\"\)\([^\"]*\)\(\"\)/\1\2 ${ALARM['MYIP']}\3/'\"'\" /etc/alarm/alarm_global.conf"
+	fi
+	# sync client and server conf
+	su alarm -c "ssh alarm@$_central '[[ -f /etc/alarm/alarm_global_central.conf ]] && cp /etc/alarm/alarm_global.conf /etc/alarm/alarm_global_central.conf'"
+done
 
 # add alarm@CENTRAL to known hosts of every user
 # and install alarmd for every user (and generate ssh-key if not exists)
@@ -76,7 +90,10 @@ for _USER in $(ls /home); do
 	su $_USER -c "ssh -o StrictHostKeyChecking=no alarm@localhost 'exit'"
 	usermod -aG alarm $_USER
 	# add alarm@CENTRAL to known hosts of every user
-	su $_USER -c "ssh -o StrictHostKeyChecking=no alarm@${ALARM['NETWORK']}${ALARM['CENTRAL']} 'exit'"
+	for _central in ${ALARM['CENTRAL']} ${ALARM['CENTRAL_ALT']}; do
+		if echo $_central | grep -v '\.' >/dev/null; then _central="${ALARM['NETWORK']}$_central"; fi
+		su $_USER -c "ssh -o StrictHostKeyChecking=no alarm@$_central 'exit'"
+	done
 done
 
 cat /home/alarm/.ssh/authorized_keys | sort | uniq >> /home/alarm/.ssh/authorized_keys.tmp
