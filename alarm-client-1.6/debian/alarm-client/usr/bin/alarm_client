@@ -1,0 +1,157 @@
+#!/bin/bash
+# alarm_client
+# lives in /usr/bin/ of each client
+
+#exit if not called from alarm_notify_all
+[[ "$ALARM_SOURCE" != "alarm_notify_all" ]] && { echo "This script is not intended to be run directly."; exit 0; }
+
+# exit if user is not in group alarm
+g=false; for group in $(groups); do [[ "$group" == "alarm" ]] && g=true; done;
+! $g && exit 0
+
+# exit if not an alarm file
+[[ "$2" != "alarm."* ]] && exit 0
+
+# create alarm_user.conf if not existent
+[ -d $HOME/.config/alarm ] || mkdir -p $HOME/.config/alarm
+touch $HOME/.config/alarm/alarm_user.conf
+
+declare -A ALARM
+#inotifywait on /tmp passes alarm file name
+ALARM['ONOFF']="$1" #values: CREATE, DELETE
+ALARM['LOCATION_FILE']="/tmp/$2" #values: /tmp/alarm.*
+ALARM['LOCATION']="${ALARM['LOCATION_FILE']#*alarm.}"
+ALL_ARRAY=(${ALARM['ALL']})
+ALARM['ALL_LENGTH']="${#ALL_ARRAY[@]}"
+
+. /etc/alarm/alarm_global.conf
+. /etc/alarm/alarm_local.conf 2>/dev/null
+. $HOME/.config/alarm/alarm_user.conf 2>/dev/null
+. /tmp/alarm_session.conf 2>/dev/null
+
+ALARM['MYIP']="$(ip -4 addr | grep "inet ${ALARM['NETWORK']}" | awk '{print $2; } ' | sed "s/\/.*//; s/${ALARM['NETWORK']}//" | head -n1 )"
+#"XXX" will be read as message and thus may generate an infinite loop; was: [[ "${ALARM['MYIP']}" == "" ]] && ALARM['MYIP']="XXX"
+#"256" will prevent this and is also an impossbile value
+[[ "${ALARM['MYIP']}" == "" ]] && ALARM['MYIP']="256"
+
+ _allstring=""
+for _ip in ${ALARM['ALL']}; do
+	# do not send to self
+	[[ "$_ip" == "${ALARM['MYIP']}" ]] && continue
+	# take full ip if no dot is in ip, add alarm network prefix otherwise
+	echo $_ip | grep '\.' && _allstring+="alarm@$_ip " || _allstring+="alarm@${ALARM['NETWORK']}$_ip "
+done
+
+function _yad {
+	_yadname="$1"
+	shift 
+	yad "$@" &
+	echo "$_yadname $!" >> /tmp/alarms.pid
+}
+
+function _unyad {
+	_single=true
+	_yadname="$1"
+	if [[ "$_yadname" == "-x" ]]; then _yadname="$2"; _single=false; fi
+	while read _name _pid; do
+		[[ "$_name" == "$_yadname" ]]; _w1=$?;
+		$_single; _w2=$?
+		[[ $(( $_w1 ^ $_w2 )) == 0 ]] && kill $_pid 2>/dev/null
+	done < /tmp/alarms.pid
+	_option="i"; $_single && _option="v"
+	grep -$_option "$_yadname" /tmp/alarms.pid > /tmp/alarms.tmp
+	mv /tmp/alarms.tmp /tmp/alarms.pid
+}
+
+function _rm { sleep 10 && rm $1; }
+
+function notifyAboutAlarm() {
+	#update status bar
+	_unyad -x revoke
+	_alarmstring=""; _bg_color=""; _fg_color=""
+	for _file in $(ls /tmp/alarm.*); do _alarmstring+="${ALARM['DESCRIPTION',${_file#/tmp/alarm.}]}|"; done
+	#separate colors from alarmstring
+	_bg_color="${ALARM['BGCOLOR',${ALARM['LOCATION']}]}"
+	_fg_color="${ALARM['FGCOLOR',${ALARM['LOCATION']}]}"
+	#do proper notification
+	case "${ALARM['ONOFF']}" in
+		"CREATE")
+			#check for ALLCLEAR permissions		
+			if [[ "${ALARM['IP',${ALARM['LOCATION']}]}" == *"${ALARM['MYIP']}"*  || "${ALARM['ALLCLEAR',${ALARM['LOCATION']}]}" == *"${ALARM['MYIP']}"* ]]; then
+                _AL = "${ALARM['LOCATION_FILE']}";
+				_yad revoke --notification --image="dialog-warning" --text="Klicke, um zu entwarnen" --command="bash -c 'touch $_AL.rm; sleep 1; rm $_AL.rm'" & 
+			fi
+			#check for NOALARM setting
+			if [[ "${ALARM['IP',${ALARM['LOCATION']}]}" == *"${ALARM['MYIP']}"*  || "${ALARM['NOALARM',${ALARM['LOCATION']}]}" == *"${ALARM['MYIP']}"* ]]; then
+				[[ "${ALARM['ACTIVE',${ALARM['LOCATION']}]}" != "TRUE" ]] && return
+			fi
+			#check for ACTIVE setting
+			if [[ "${ALARM['ACTIVE',${ALARM['LOCATION']}]}" == "FALSE" ]]; then return; fi
+			if [[ ${ALARM['VIDEO',${ALARM['LOCATION']}]} != "" ]]; then
+                rnd=$RANDOM
+				# display message instead of alarm if "message" is part of alarm file
+				if [[ "$(grep -i message ${ALARM['LOCATION_FILE']})" != "" ]]; then
+					echo "$(date +%H:%M:%S)"> /tmp/$rnd.alarm.txt
+					#remove last line (IP) and first line ("message")
+					head -n -1 ${ALARM['LOCATION_FILE']} | tail -n +2 >> /tmp/$rnd.alarm.txt
+					_bg_color="#ffdd00" #orange
+					_fg_color="#000000" #white
+				else
+					echo -e "$(date +%H:%M:%S)\n\nALARM\n\n${ALARM['DESCRIPTION',${ALARM['LOCATION']}]}" > /tmp/$rnd.alarm.txt
+					if [[ "$_bg_color" == "" ]]; then _bg_color="#ff0000"; fi #red if not set
+					if [[ "$_fg_color" == "" ]]; then _fg_color="#ffffff"; fi #white if not set
+				fi
+				_fullscreen=""; _size=24
+				if [[ "${ALARM['VIDEO',${ALARM['LOCATION']}]}" == "fullscreen" ]]; then _size=72; _fullscreen="--fullscreen"; fi
+				_morealarms="$(echo $_alarmstring | sed "s/${ALARM['DESCRIPTION',${ALARM['LOCATION']}]}|//")"
+				if [[ "$_morealarms" != "" ]]; then _morealarms="Weitere Alarme: $_morealarms"; fi
+				_yad "create.${ALARM['LOCATION']}" --title "" --text-info --filename="/tmp/$rnd.alarm.txt" --text="<span foreground=\"red\" size=\"x-large\">$_morealarms</span>" --back="$_bg_color" --fore="$_fg_color"  --justify='center' --no-buttons --width=500 --height=300 --sticky --on-top --fontname="Sans Bold $_size" $_fullscreen &
+                		_rm /tmp/$rnd.alarm.txt &
+			fi
+			if [[ ${ALARM['AUDIO',${ALARM['LOCATION']}]} != "" ]]; then
+				_audiofile="/usr/share/alarm/audio/${ALARM['AUDIO',${ALARM['LOCATION']}]}"
+				if [[ "${ALARM['AUDIO_VOLUME',${ALARM['LOCATION']}]}" != "" ]]; then
+					_audiovolume=${ALARM['AUDIO_VOLUME',${ALARM['LOCATION']}]}
+				else
+					_audiovolume=3
+				fi				
+				_audiolength="$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 $_audiofile)"
+				_loops="$(echo ${ALARM['AUDIO_DURATION']}/$_audiolength | bc)";
+				if [[ $_loops == 0 ]]; then _loops=1; fi #0 means endless loop...
+				_volume_user="$(amixer get Master | grep '%'  | awk '{ print $4; }' | tail -n1)"
+				_onoff_user="$(amixer get Master | grep '%'  | awk '{ print $6; }' | tail -n1)" #save mute/unmute and turn speaker on if necessary
+				if [[ ${_onoff_user} == '[off]' ]]; then _onoff_user="mute"; else _onoff_user=''; fi
+				#amixer set Master $((21845*$_audiovolume))
+				amixer set Master "$((33*$_audiovolume))%" unmute
+				ffplay -nodisp -autoexit -loop $_loops $_audiofile
+				amixer set Master $_volume_user	$_onoff_user
+			fi
+			;;
+		"DELETE")
+			_unyad -x revoke
+			if [[ "${ALARM['VIDEO',${ALARM['LOCATION']}]}" != "" ]]; then
+                rnd=$RANDOM
+				if [[ "${ALARM['IP',${ALARM['LOCATION']}]}" == *"${ALARM['MYIP']}"*  || "${ALARM['NOALARM',${ALARM['LOCATION']}]}" == *"${ALARM['MYIP']}"* ]]; then
+					echo -e "$(date +%H:%M:%S) Daten wurden gesendet" > /tmp/$rnd.alarm.txt
+					_yad revoked --title "" --text-info --filename="/tmp/$rnd.alarm.txt" --back='#ffffff' --fore='#464646' --width=300 --no-buttons --sticky --on-top --fontname="Sans 10" &
+                    sleep 10 && rm /tmp/$rnd.alarm.txt
+					_unyad revoke
+				else
+					echo -e "$(date +%H:%M:%S)\n\nEntwarnung\n\n${ALARM['DESCRIPTION',${ALARM['LOCATION']}]}" > /tmp/$rnd.alarm.txt
+					_fullscreen=""; _size=24
+					if [[ "${ALARM['VIDEO',${ALARM['LOCATION']}]}" == "fullscreen" ]]; then _size=72; _fullscreen="--fullscreen"; fi
+					_morealarms="$(echo $_alarmstring | sed "s/${ALARM['DESCRIPTION',${ALARM['LOCATION']}]}|//")"
+					if [[ "$_morealarms" != "" ]]; then _morealarms="Noch aktive Alarme: $_morealarms"; fi
+					_yad "delete.${ALARM['LOCATION']}" --title "" --text-info --text="<span foreground=\"red\" size=\"x-large\">$_morealarms</span>" --filename="/tmp/$rnd.alarm.txt" --back='#00ff00' --fore='#464646'  --justify='center' --no-buttons --width=500 --height=300 --sticky --on-top --fontname="Sans Bold $_size" $_fullscreen &
+                    			_rm /tmp/$rnd.alarm.txt
+				fi
+			fi
+			;;
+	esac
+	#update status bar, part ii
+	if [[ "$_alarmstring" == "" ]]; then _icon="emblem-default"; else _icon="software-update-urgent"; fi
+	_yad status --notification --image="$_icon" --text="Aktuelle Notfallalarme" --command=menu --menu="$_alarmstring"'|Nicht mehr anzeigen!quit' &		 	
+}
+
+notifyAboutAlarm
+exit 0

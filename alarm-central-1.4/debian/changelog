@@ -1,3 +1,18 @@
+alarm-central (1.4-4) UNRELEASED; urgency=low
+  
+  [ Marco Kühnel ]
+  * alarm_central.sh: replaced fallback IP XXX by 256 in order to prevent
+    loops
+  
+ -- Marco Kühnel <kuehnel@codecivil.de>  Mon, 25 Mar 2024 10:30:00 +0100
+
+alarm-central (1.4-3) UNRELEASED; urgency=low
+  
+  [ Marco Kühnel ]
+  * alarm-central-postinstall.sh: added check if run by root
+  
+ -- Marco Kühnel <kuehnel@codecivil.de>  Tue, 30 Jan 2024 17:00:00 +0100
+
 alarm-central (1.4-2) UNRELEASED; urgency=low
   
   [ Marco Kühnel ]

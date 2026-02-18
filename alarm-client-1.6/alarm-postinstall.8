@@ -1,0 +1,50 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" (C) Copyright 2017 Marco Kühnel <kuehnel@codecivil.de>,
+.\"
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH SEUSB2 8 "March 15, 2025"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+alarm-postinstall \- set up the client after package installation
+.SH SYNOPSIS
+.B alarm-postinstall [-n|--network PATTERN] [-p|--password STRING] [-c|--central IPSLUG] [-a|--addusers] [-y|--yes]
+
+.SH DESCRIPTION
+alarm-postinstall configures the most important bits in order to attach the client to a central node and register local users to the alarm node.
+If runs interactively for any missing but required options.
+
+.SH OPTIONS
+.TP 
+\fB\-a\fP,\fB\-\-addusers\fP
+Adds all local users to the group alarm. 
+.TP 
+\fB\-y\fP,\fB\-\-yes\fP
+Selects the suggested network if none is given 
+
+.SH ATTRIBUTES
+.TP 
+\fB\-n\fP,\fB\-\-network\fP PATTERN
+PATTERN is the first three octets of a node IP. At this point subnet masks are not yet supported. The PATTERN has to end with a dot, e.g. '192.168.0.'.
+.TP 
+\fB\-p\fP,\fB\-\-password\fP STRING
+is the password for user alarm on the given central node
+.TP 
+\fB\-c\fP,\fB\-\-central\fP IPSLUG
+Usually, the last octet of the IP of the central node, e.g. 9 for 192.168.0.9, if '192.168.0.' is the provided network. If you have several central nodes
+on different networks, provide the full IP here.
+.SH SEE ALSO
+.BR alarm-client (8).
+

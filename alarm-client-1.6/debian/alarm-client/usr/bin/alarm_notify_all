@@ -1,0 +1,19 @@
+#!/bin/bash
+#exit if not called from alarm_systemd
+[[ "$ALARM_SOURCE" != "alarm_systemd" ]] && { echo "This script is not intended to be run directly."; exit 0; }
+#exit if not run by root
+[[ "$(whoami)" != "root" ]] && { echo "This script can only be run by root."; exit 0; }
+
+function notifyAboutAlarm() {
+    XUSERS=($(who|awk '{print $1}'| sort -u | uniq))
+    if [[ "${XUSERS[0]}" == "" ]]; then echo "There is no X session for any alarm user!"; fi
+    for XUSER in "${XUSERS[@]}"; do
+        systemd-run --machine="${XUSER}"@.host --user \
+           -E PATH="${PATH}" \
+           -E ALARM_SOURCE="alarm_notify_all" \
+           alarm_client "$@" &
+    done
+}
+
+notifyAboutAlarm "$@"
+exit 0

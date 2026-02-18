@@ -1,0 +1,172 @@
+#!/bin/bash
+# alarm-test TYPE ACTION
+# TYPE: 
+#   alarm:
+#       ACTIONs: create, delete, invoke, revoke
+#   network:
+#       ACTIONs: self, central, all, <IP>
+#   users:
+#        ACTIONs: show, add [USER|s], delete [USER|s]   
+
+#exit if not run by user root
+#[[ "$(whoami)" != "root" ]] && { echo "This script must be run by root."; exit 0; }
+
+function parseArgs() {
+    TYPE="$1"
+    ACTION="$2"
+    ARGS="${*:3}"
+}
+
+parseArgs "$@"
+
+# exit if user is not in group alarm
+g=false; for group in $(groups); do [[ "$group" == "alarm" ]] && g=true; done;
+if [[ "$(whoami)" == "root" ]]; then g=true; fi
+! $g && { echo "You are not member of the alarm group. There is no test available to you."; exit 0; }
+
+declare -A ALARM
+
+. /etc/alarm/alarm_global.conf
+. /etc/alarm/alarm_local.conf
+. /tmp/alarm_session.conf 2>/dev/null
+
+case "$TYPE" in
+    "alarm")
+        if [[ "$ARGS" == "" ]]; then BUTTON="Default"; else BUTTON="$3"; fi
+        case "$ACTION" in
+            "create")
+                if [[ "$BUTTON" == "Message" ]]; then CONTENT="message\n${*:4}\n"; else CONTENT=""; fi
+                if [[ "$(whoami)" == "root" ]]; then su alarm -c "echo -e '$CONTENT' > /tmp/alarm.$BUTTON"; else
+                if [[ "$(whoami)" == "alarm" ]]; then echo -e "$CONTENT" > /tmp/alarm."$BUTTON"; else 
+                    echo "'alarm create' is only available for root and alarm."
+                fi
+                fi
+            ;;
+            "delete")
+                if [[ "$(whoami)" == "root" ]]; then su alarm -c "rm /tmp/alarm.$BUTTON"; else
+                if [[ "$(whoami)" == "alarm" ]]; then rm /tmp/alarm."$BUTTON"; else 
+                    echo "'alarm delete' is only available for root and alarm."
+                fi
+                fi
+                
+            ;;
+            "invoke")
+                if [[ "$(whoami)" == "root" ]]; then su alarm -c "ALARM_SOURCE='alarmd_systemd' alarm_systemd CREATE alarm.$BUTTON"; else
+                if [[ "$(whoami)" == "alarm" ]]; then ALARM_SOURCE="alarmd_systemd" alarm_systemd CREATE alarm."$BUTTON"; else 
+                    ALARM_SOURCE="alarm_notify_all" alarm_client CREATE alarm."$BUTTON"
+                fi
+                fi
+            ;;
+            "revoke")
+                if [[ "$(whoami)" == "root" ]]; then su alarm -c "ALARM_SOURCE='alarmd_systemd' alarm_systemd DELETE alarm.$BUTTON"; else
+                if [[ "$(whoami)" == "alarm" ]]; then ALARM_SOURCE="alarmd_systemd" alarm_systemd DELETE alarm."$BUTTON"; else 
+                    ALARM_SOURCE="alarm_notify_all" alarm_client DELETE alarm."$BUTTON"
+                fi
+                fi
+            ;;
+            "-h"|"--help")
+                echo "Available actions: create, delete, invoke, revoke"
+            ;;
+            *) echo "'$ACTION' is not an action."
+            ;;
+        esac
+    ;;
+    "network")
+        if [[ "root alarm" != *"$(whoami)"* ]]; then echo "'network' is only available for root and alarm."; fi
+        ALARM_MYIP="$(ip -4 addr | grep "inet ${ALARM['NETWORK']}" | awk '{print $2; } ' | sed "s/\/.*//" | head -n1 )"
+        case "$ACTION" in
+            "self")
+                if [[ "$(whoami)" == "root" ]]; then su alarm -c "ssh alarm@localhost 'echo self connection successful'"; fi
+                if [[ "$(whoami)" == "alarm" ]]; then ssh alarm@localhost 'echo self connection successful'; fi
+            ;;
+            "central")
+                for _central in ${ALARM['CENTRAL']} ${ALARM['CENTRAL_ALT']}; do
+                    # take full ip if no dot is in ip, add alarm network prefix otherwise
+                    echo "$_central" | grep '\.' > /dev/null || _central="${ALARM['NETWORK']}$_central"
+                    if [[ "$(whoami)" == "root" ]]; then su alarm -c "ssh alarm@$_central 'echo central $_central is reachable; ssh alarm@$ALARM_MYIP echo central $_central can reach this node'"; fi
+                    if [[ "$(whoami)" == "alarm" ]]; then ssh alarm@"$_central" 'echo central $_central is reachable; ssh alarm@$ALARM_MYIP echo central $_central can reach this node'; fi
+                done
+            ;;
+            "all")
+                 _allstring=""
+                for _ip in ${ALARM['ALL']}; do
+                    # do not send to self
+                    [[ "$_ip" == "${ALARM['MYIP']}" ]] && continue
+                    # take full ip if no dot is in ip, add alarm network prefix otherwise
+                    echo "$_ip" | grep '\.' && _allstring+="alarm@$_ip " || _allstring+="alarm@${ALARM['NETWORK']}$_ip "
+                done
+                if [[ "$_allstring" != "" ]]; then
+                    if [[ "$(whoami)" == "root" ]]; then su alarm -c "parallel-ssh --host '$_allstring' -O StrictHostKeyChecking=no --inline 'ssh alarm@$ALARM_MYIP echo can also reach this node'"; fi
+                    if [[ "$(whoami)" == "alarm" ]]; then parallel-ssh --host "$_allstring" -O StrictHostKeyChecking=no --inline "ssh alarm@$ALARM_MYIP 'echo can also reach this node'"; fi
+                fi
+            ;;
+            "-h"|"--help")
+                echo "Available actions: self, central, all, <IP>"
+            ;;
+            *)
+                echo "$ACTION" | grep '^[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$' >/dev/null && {
+                    if [[ "$(whoami)" == "root" ]]; then su alarm -c "ssh alarm@$ACTION 'echo node $ACTION is reachable'; ssh alarm@$ALARM_MYIP 'echo node $ACTION can reach this node'"; fi
+                    if [[ "$(whoami)" == "alarm" ]]; then ssh alarm@"$ACTION" "echo 'node $ACTION is reachable'; ssh alarm@$ALARM_MYIP 'echo node $ACTION can reach this node'"; fi
+                }
+            ;;
+        esac
+    ;;
+    "users")
+        if [[ "root" != "$(whoami)" ]]; then echo "'users' is only available for root."; return; fi
+        case "$ACTION" in
+            "show")
+                echo -n "Registered: "
+                members=$(grep alarm /etc/group | sed 's/.*\://')
+                echo "$members"
+                komma="Not registered: "
+                for _user in $(grep home /etc/passwd | sed 's/\:.*//'); do
+                    [[ "$members" != *"$_user"* ]] && {
+                        echo -en "$komma$_user"
+                        komma=","
+                    } 
+                done
+                echo
+            ;;
+            "add")
+                for _user in $USERS; do
+                    usermod -aG alarm "$_user"
+                done
+            ;;
+            "remove")
+                for _user in $USERS; do
+                    group=$(groups "$_user" | sed 's/.*://;s/alarm//;s/[ ]/,/g;s/^,//;s/,$//')
+                    usermod -G "$group" "$_user"
+                done
+            ;;
+            "-h"|"--help")
+                echo "Available actions: show, add, remove"
+            ;;
+            *) echo "'$ACTION' is not an action."
+            ;;
+        esac
+    ;;
+    "version")
+       if [[ "root" != "$(whoami)" ]]; then echo "'version' is only available for root."; return; fi
+       case "$ACTION" in
+            "clean")
+                for _USER in $(grep home /etc/passwd | sed 's/\:.*//'); do
+                    _HOME=$(bash -c "echo ~$_USER")
+                    [[ -f "$_HOME"/.config/autostart/alarmd.desktop ]] && {
+                        rm "$_HOME"/.config/autostart/alarmd.desktop
+                        echo "$_USER: removed residues of version 1.4 or older"
+                    }
+                done
+            ;;
+            "-h"|"--help")
+                echo "Available actions: clean"
+            ;;
+            *) echo "'$ACTION' is not an action."
+            ;;
+        esac
+    ;;
+    "-h"|"--help")
+        echo "Available types: alarm, network, users, version"
+    ;;
+    *) echo "'$TYPE' is not a test type."
+    ;;
+esac

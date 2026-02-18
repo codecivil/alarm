@@ -1,0 +1,14 @@
+alarm_client /usr/bin
+alarm_configurator /usr/bin
+alarm_notify_all /usr/bin
+alarm-test /usr/bin
+alarm-postinstall /usr/bin
+alarm_sudoers /etc/sudoers.d/
+alarm_configurator.desktop /usr/share/applications
+alarmd.service /lib/systemd/system
+alarmd_systemd /usr/bin
+alarm_systemd /usr/bin
+alarm_client /usr/bin
+alarm_global.conf /etc/alarm
+alarm_local.conf /etc/alarm
+audio/* /usr/share/alarm/audio

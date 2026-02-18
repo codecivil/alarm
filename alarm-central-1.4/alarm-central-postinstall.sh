@@ -2,6 +2,9 @@
 #alarm-central-postinstall.sh
 #configures most important network settings
 
+#script mus be run as root
+if [[ "$(whoami)" != "root" ]]; then echo "This script must be run as root."; exit 0; fi
+
 _default_network="$(ip addr | grep 'inet ' | awk '{printf "%s\n",$2 }' | sort | tail -n1)"
 _default_network="${_default_network%.*}"
 _default_ip="$(ip -4 addr | grep "inet $_default_network." | awk '{print $2; } ' | sed "s/\/.*//; s/$_default_network.//")"

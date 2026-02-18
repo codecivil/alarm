@@ -3,10 +3,10 @@
 d2390025b2cdb26e231fc5568e078853  lib/systemd/system/alarm_cleanup.service
 f6b0102b1b8f67630703fe2f2ec798e5  lib/systemd/system/alarm_cleanup.timer
 d09f24a04dd4b56a806d6016fd2a30cb  lib/systemd/system/alarmd.service
-9955636a6bd5b98ddc5df44a2ac3f78f  usr/bin/alarm-central-postinstall.sh
+ccb790f1df93de25123cf8a8a35e122c  usr/bin/alarm-central-postinstall.sh
 5de9f5f61ec8c9f9acb1cb5deec79237  usr/bin/alarm_authlog.sh
-53bcb265c229b23c78d2fef1d0230d98  usr/bin/alarm_central.sh
+da6cf0864ff2edd68e71bc65964ee135  usr/bin/alarm_central.sh
 ce01c9210583973c55a67cf1616c2f0e  usr/bin/alarm_cleanup.sh
 00b878a2f9a18678c6c9c488f011b246  usr/bin/alarmd_central.sh
-fc8160daaca5b9b3dcb88001f46197bf  usr/share/doc/alarm-central/changelog.Debian.gz
+89ae08491c566d1d39211d6dea7d084a  usr/share/doc/alarm-central/changelog.Debian.gz
 1002498245a87596151853e126fe2dbb  usr/share/doc/alarm-central/copyright

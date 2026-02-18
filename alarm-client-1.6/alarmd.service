@@ -1,0 +1,11 @@
+[Unit]
+Description=FastResponseDaemon for systemd
+
+[Service]
+User=alarm
+ExecStart=/usr/bin/alarmd_systemd
+ExecStop=/usr/bin/rm /tmp/lock.alarm.alarm
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

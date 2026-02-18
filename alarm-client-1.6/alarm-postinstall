@@ -1,0 +1,105 @@
+#!/bin/bash
+#alarm-postinstall [-n|--network NETWORK] [-p|--password PASSWORD] [-c|--central CENTRAL] [-y|--yes]
+#configures most important network settings
+
+function parseArgs() {
+	_yes=false
+	while [[ "$*" != '' ]]; do
+		case "$1" in
+			"-n"|"--network")
+				shift
+				_network="$1"
+				;;
+			"-p"|"--password")
+				shift
+				_password="$1"
+				;;
+			"-c"|"--central")
+				shift
+				_central="$1"
+				;;
+			"-a"|"--addusers")
+				_addusers="y"
+				;;
+			"-y"|"--yes")
+				_yes=true
+				;;
+		esac
+		shift
+	done
+}
+
+#test is run as root
+if [[ "$(whoami)" != "root" ]]; then echo "This script must be run as root."; exit 0; fi
+
+
+parseArgs $@
+
+_default_network="$(ip addr | grep 'inet ' | awk '{printf "%s\n",$2 }' | sort | tail -n1)"
+_default_network="${_default_network%.*}"
+if $_yes; then 	[[ "$_network" == "" ]] && _network="$_default_network"; fi
+while [[ "$_network" != *.*.* ]]; do 
+	echo -n "Your network [$_default_network]: "; read _network; 
+	[[ "$_network" == "" ]] && _network="$_default_network"	
+done
+while [[ 0 -ge "$_central" ]]; do echo -n "Last octet or full IPs address of alarm CENTRALs (most reliably accessible nodes): "; read _central; done
+
+sed -i "s/^ALARM\['CENTRAL'\]=[^ #]*/ALARM\['CENTRAL'\]=\"$_central\"/g;s/^ALARM\['NETWORK'\]=[^ #]*/ALARM\['NETWORK'\]=\"$_network\.\"/g;" /etc/alarm/alarm_global.conf
+chmod 660 /etc/alarm/alarm_global.conf
+chown root:alarm /etc/alarm/alarm_global.conf
+[ -f /etc/alarm/alarm_global_central.conf ] && cat /etc/alarm/alarm_global_central.conf >> /etc/alarm/alarm_global.conf
+
+declare -A ALARM
+. /etc/alarm/alarm_global.conf
+
+#allow passwordless login to alarm@CENTRAL for every user alarm and clean up authorized key file on CENTRAL
+for _central in ${ALARM['CENTRAL']} ${ALARM['CENTRAL_ALT']}; do
+	if echo "$_central" | grep -v '\.' >/dev/null; then _central="${ALARM['NETWORK']}$_central"; fi
+    #su alarm -c "ssh -o StrictHostKeyChecking=no alarm@$_central 'exit'" 2>/dev/null
+    #how to prevent infinite loop in case client = central?
+    echo "Add nodes key to key store of $_central"
+	if [[ "$_password" != "" ]]; then
+		cat /home/alarm/.ssh/authorized_keys | SSHPASS="$_password" sshpass -e ssh -o StrictHostKeyChecking=no alarm@"$_central" 'cat >> .ssh/authorized_keys && /usr/bin/alarm_cleanup.sh'
+	else
+		cat /home/alarm/.ssh/authorized_keys | ssh alarm@"$_central" 'cat >> .ssh/authorized_keys && /usr/bin/alarm_cleanup.sh 2>/dev/null || echo "Error: package alarm-central is not (properly) installed on CENTRAL"'
+	fi
+    # get and read global conf
+    echo "Get global configuration"
+	su alarm -c "scp alarm@$_central:/etc/alarm/alarm_global.conf /etc/alarm/"
+	. /etc/alarm/alarm_global.conf
+	# auto registration: add local IP to the ALL value in alarm_global.conf if not yet there
+    echo "Register node to global configuration of $_central"
+	ALARM['MYIP']="$(ip -4 addr | grep "inet ${ALARM['NETWORK']}" | awk '{print $2; } ' | sed "s/\/.*//; s/${ALARM['NETWORK']}//" | head -n1 )"
+	if [[ "${ALARM['ALL']}" != *" ${ALARM['MYIP']}"* ]] && [[ "${ALARM['ALL']}" != *"${ALARM['MYIP']} "* ]]; then
+		su alarm -c "ssh alarm@$_central cp /etc/alarm/alarm_global.conf /etc/alarm/alarm_global_$(date +%s).conf" #backup old global conf
+		su alarm -c "ssh alarm@$_central 'sed -i '\"'\"'s/\(ALARM.*ALL.*=\"\)\([^\"]*\)\(\"\)/\1\2 ${ALARM['MYIP']}\3/'\"'\" /etc/alarm/alarm_global.conf"
+	fi
+    # add node to central known_hosts file
+    echo "Register node to known hosts of $_central"
+	if echo "${ALARM['MYIP']}" | grep -v '\.' >/dev/null; then ALARM_MYIP="${ALARM['NETWORK']}${ALARM['MYIP']}"; else ALARM_MYIP="${ALARM['MYIP']}"; fi
+    su alarm -c "ssh alarm@$_central 'ssh alarm@$ALARM_MYIP exit'"
+	# sync client and server conf
+	su alarm -c "ssh alarm@$_central '[[ -f /etc/alarm/alarm_global_central.conf ]] && cp /etc/alarm/alarm_global.conf /etc/alarm/alarm_global_central.conf'"
+done
+
+# add localhost to known hosts of every user
+su alarm -c "ssh -o StrictHostKeyChecking=no alarm@localhost 'exit'"
+
+#add users to group alarm if so desired
+while [[ "$_addusers" != "y" && "$_addusers" != "Y" && "$_addusers" != "n" && "$_addusers" != "N" ]]; do 
+	echo -n "Add all users to group alarm (Y/n) ? "; read _addusers; 
+	[[ "$_addusers" == "" ]] && _addusers="Y"	
+done
+
+[[ "$_addusers" == "y" || "$_addusers" == "Y" ]] && {
+    for _USER in $(grep home /etc/passwd | sed 's/\:.*//'); do
+        usermod -aG alarm "$_USER"
+    done
+}
+
+# repair ownership and permissions of authorized keys file; not necessary anymore
+#chown alarm:alarm /home/alarm/.ssh/authorized_keys
+#chmod 640 /home/alarm/.ssh/authorized_keys
+
+exit 0
+

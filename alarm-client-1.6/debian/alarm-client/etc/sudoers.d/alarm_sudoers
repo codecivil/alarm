@@ -1,0 +1,2 @@
+alarm	ALL=(root) NOPASSWD:SETENV: /usr/bin/alarm_notify_all
+

@@ -1,0 +1,3 @@
+/etc/alarm/alarm_global.conf
+/etc/alarm/alarm_local.conf
+/etc/sudoers.d/alarm_sudoers

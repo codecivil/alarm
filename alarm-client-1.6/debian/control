@@ -1,0 +1,18 @@
+Source: alarm-client
+Section: misc
+Priority: optional
+Maintainer: Marco Kühnel <kuehnel@codecivil.de>
+Build-Depends: debhelper (>= 13)
+Standards-Version: 4.5.1
+Homepage: https://www2.codecivil.de
+#Vcs-Git: git://anonscm.debian.org/collab-maint/alarm-clinet.git
+#Vcs-Browser: http://anonscm.debian.org/?p=collab-maint/alarm-client.git;a=summary
+
+Package: alarm-client
+Architecture: all
+Depends: ${misc:Depends}, yad, pssh, inotify-tools, ffmpeg, sshpass, ssh-askpass
+Description: Notifies about emergency alarms and distributes them
+ The package provides a system to be notified by alarm set of by Dash buttons
+ and distributed by a properly configured AP (see alarm-ap package). For faster
+ notification, the client helps distributing the alarm in the network. There is
+ a tool for the local configuration.

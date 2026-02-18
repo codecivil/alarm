@@ -1,0 +1,124 @@
+myStrom button concept:
+
+* you must allow them to connect otherwise they issue a connection try indistinguishable from a button press every 12h!
+* so the AP gets an additional network that is the only wifi and separated from the LAN, say 192.168.222.1/28; the LAN has no gateway set!
+* this additional network listens on port 40080 in order to receive alarm button presses; install uhttpd-mod-lua and add to uci config /etc/config/uhttpd section
+config uhttpd alarm
+
+	# HTTP listen addresses, multiple allowed
+	list listen_http	192.168.122.1:40080
+
+	# HTTPS listen addresses, multiple allowed
+#	list listen_https	192.168.122.1:40443
+
+	# Redirect HTTP requests to HTTPS if possible
+#	option redirect_https	1
+
+	# Server document root
+	option home		/www
+
+	# Reject requests from RFC1918 IP addresses
+	# directed to the servers public IP(s).
+	# This is a DNS rebinding countermeasure.
+	option rfc1918_filter 1
+
+	# Maximum number of concurrent requests.
+	# If this number is exceeded, further requests are
+	# queued until the number of running requests drops
+	# below the limit again.
+	option max_requests 3
+
+	# Maximum number of concurrent connections.
+	# If this number is exceeded, further TCP connection
+	# attempts are queued until the number of active
+	# connections drops below the limit again.
+	option max_connections 10
+
+	# Certificate and private key for HTTPS.
+	# If no listen_https addresses are given,
+	# the key options are ignored.
+#	option cert		/etc/uhttpd.crt
+#	option key		/etc/uhttpd.key
+
+	# CGI url prefix, will be searched in docroot.
+	# Default is /cgi-bin
+	option cgi_prefix	/cgi-bin
+
+	# List of extension->interpreter mappings.
+	# Files with an associated interpreter can
+	# be called outside of the CGI prefix and do
+	# not need to be executable.
+#	list interpreter	".php=/usr/bin/php-cgi"
+#	list interpreter	".cgi=/usr/bin/perl"
+
+	# Lua url prefix and handler script.
+	# Lua support is disabled if no prefix given.
+	option lua_prefix	/alarm
+	option lua_handler	/usr/bin/detect_alarm.lua
+
+	# Specify the ubus-rpc prefix and socket path.
+#	option ubus_prefix	/ubus
+#	option ubus_socket	/var/run/ubus.sock
+
+	# CGI/Lua timeout, if the called script does not
+	# write data within the given amount of seconds,
+	# the server will terminate the request with
+	# 504 Gateway Timeout response.
+	option script_timeout	60
+
+	# Network timeout, if the current connection is
+	# blocked for the specified amount of seconds,
+	# the server will terminate the associated
+	# request process.
+	option network_timeout	30
+
+	# HTTP Keep-Alive, specifies the timeout for persistent
+	# HTTP/1.1 connections. Setting this to 0 will disable
+	# persistent HTTP connections.
+	option http_keepalive	20
+
+	# TCP Keep-Alive, send periodic keep-alive probes
+	# over established connections to detect dead peers.
+	# The value is given in seconds to specify the
+	# interval between subsequent probes.
+	# Setting this to 0 will disable TCP keep-alive.
+	option tcp_keepalive	1
+
+	# Basic auth realm, defaults to local hostname
+#	option realm	OpenWrt
+
+	# Configuration file in busybox httpd format
+#	option config	/etc/httpd.conf
+
+	# Do not follow symlinks that point outside of the
+	# home directory.
+#	option no_symlinks	0
+
+	# Do not produce directory listings but send 403
+	# instead if a client requests an url pointing to
+	# a directory without any index file.
+	option no_dirlists	1
+
+	# Do not authenticate any ubus-rpc requests against
+	# the ubus session/access procedure.
+	# This is dangerous and should be always left off
+	# except for development and debug purposes!
+#	option no_ubusauth	0
+
+	# For this instance of uhttpd use the listed httpauth
+	# sections to require Basic auth to the specified
+	# resources.
+#	list httpauth prefix_user
+
+* the buttons are attached to this wifi with fixed IPs, e.g.
+	curl --location -g --request POST 'http://192.168.222.1/api/v1/connect' --data-raw '{"ssid": "willibald_emergency0", "passwd": "<PASSWORD>", "ip": "192.168.222.5", "mask": "255.255.255.240", "gw": "192.168.222.1", "dns": "192.168.222.1"}'
+* they have actions set like
+curl --location -g --request POST 'http://192.168.222.1/api/v1/action/single' --data-raw 'get://[AP_IP]:40080/alarm'
+curl --location -g --request POST 'http://192.168.222.1/api/v1/action/double' --data-raw 'get://[AP_IP]:40080/alarm'
+* double click should remove the alarm; this is implemented in the lua script, so no need to define an extra actions
+(see myStrom manual: every button push sends mac,action and battery by default as (get) parameters; battery action every 12h; this is what we observed)
+* do nothing for generic action since this is triggered every 12h
+curl --location -g --request POST 'http://192.168.222.1/api/v1/action/generic' --data-raw 'get://[AP_IP]:40080/donothing...'
+* CLOAKED_MAC = MAC without double colons (this is enough of cloaking and is submitted by the button automatically)
+* in alarm_ap this cloaked mac has to be stored instead of the usual one (for dash buttons)!
+

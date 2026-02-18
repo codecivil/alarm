@@ -1,0 +1,204 @@
+alarm-client (1.6-2) UNRELEASED; urgency=low
+
+  [ Marco Kühnel ]
+  * alarm_client: removed subshells (not working with systemd-run!) 
+  
+ -- Marco Kühnel <kuehnel@codecivil.de>  Wed, 18 Feb 2026 13:15:00 +0100
+
+alarm-client (1.6-1) UNRELEASED; urgency=low
+
+  [ Marco Kühnel ]
+  * alarm_notify_all adapted to be wayland compatible by using
+    systemd-run
+  
+ -- Marco Kühnel <kuehnel@codecivil.de>  Wed, 11 Feb 2026 14:45:00 +0100
+
+alarm-client (1.5-5) UNRELEASED; urgency=low
+
+  [ Marco Kühnel ]
+  * postinst: typo corrected
+  
+ -- Marco Kühnel <kuehnel@codecivil.de>  Tue, 01 Apr 2025 13:00:00 +0200
+
+alarm-client (1.5-4) UNRELEASED; urgency=low
+
+  [ Marco Kühnel ]
+  * postinst: wrong order of fixing permissions on authorized_keys and 
+    know_hosts
+  * dependency on ssh-askpass added
+    
+ -- Marco Kühnel <kuehnel@codecivil.de>  Tue, 01 Apr 2025 12:00:00 +0200
+
+alarm-client (1.5-3) UNRELEASED; urgency=low
+
+  [ Marco Kühnel ]
+  * alarm-postinstall: add node to known hosts of central
+  * minor fixes
+    
+ -- Marco Kühnel <kuehnel@codecivil.de>  Wed, 19 Mar 2025 17:00:00 +0100
+
+alarm-client (1.5-2) UNRELEASED; urgency=low
+
+  [ Marco Kühnel ]
+  * fix: authorized_keys file on central was overwritten
+    
+ -- Marco Kühnel <kuehnel@codecivil.de>  Wed, 19 Mar 2025 10:30:00 +0100
+
+alarm-client (1.5-1) UNRELEASED; urgency=low
+
+  [ Marco Kühnel ]
+  * rewrite to get done almos everything by user alarm
+  * alarm has sudoers rights to call alarm_client.sh for every user
+  * this makes user registration much simpler: just add user to group alarm
+    
+ -- Marco Kühnel <kuehnel@codecivil.de>  Thu, 13 Mar 2025 15:30:00 +0100
+
+alarm-client (1.4-13) UNRELEASED; urgency=low
+
+  [ Marco Kühnel ]
+  * postinst: check of shadow file threw error if user is not in the file
+    (since dash update?)
+    
+ -- Marco Kühnel <kuehnel@codecivil.de>  Mon, 08 Apr 2024 12:30:00 +0100
+
+alarm-client (1.4-12) UNRELEASED; urgency=low
+
+  [ Marco Kühnel ]
+  * alarm_client.sh: replaced fallback IP XXX by 256 in order to prevent
+    loops
+    
+ -- Marco Kühnel <kuehnel@codecivil.de>  Mon, 25 Mar 2024 10:30:00 +0100
+
+alarm-client (1.4-11) UNRELEASED; urgency=low
+
+  [ Marco Kühnel ]
+  * alarm_client.sh: Postpone deletion of alarms until raising the alarm
+    has certainly ceased in order to prevent loops
+  * alarm_client.sh: Refuses to distribute an already deleted alarm at runtime
+    (loop prevention on a minor timescale)
+  
+ -- Marco Kühnel <kuehnel@codecivil.de>  Thu, 21 Mar 2024 15:00:00 +0100
+
+alarm-client (1.4-10) UNRELEASED; urgency=low
+
+  [ Marco Kühnel ]
+  * alarm-postinstall.sh: added check if run by root
+  * fix: authorized keys file of alarm was owned by root at creation
+  
+ -- Marco Kühnel <kuehnel@codecivil.de>  Tue, 30 Jan 2024 17:00:00 +0100
+
+alarm-client (1.4-9) UNRELEASED; urgency=low
+
+  [ Marco Kühnel ]
+  * alarm_client.sh: amixer command now switches speakers on and is adapted
+    to variable volume limits
+
+ -- Marco Kühnel <kuehnel@codecivil.de>  Tue, 25 Jul 2023 17:30:00 +0100
+
+alarm-client (1.4-8) UNRELEASED; urgency=low
+
+  [ Marco Kühnel ]
+  * alarm_postinstall.sh: auto registration of client on CENTRALs
+
+ -- Marco Kühnel <kuehnel@codecivil.de>  Thu, 01 Jun 2023 12:00:00 +0100
+
+alarm-client (1.4-7) UNRELEASED; urgency=low
+
+  [ Marco Kühnel ]
+  * alarmd.sh: determination of CENTRAL ended always in last available
+    option instead of first
+  * alarm_postinstall.sh: make passwordless login and get ssh-known to
+    all CENTRALs
+
+ -- Marco Kühnel <kuehnel@codecivil.de>  Thu, 04 May 2023 18:00:00 +0100
+
+alarm-client (1.4-6) UNRELEASED; urgency=low
+
+  [ Marco Kühnel ]
+  * alarmd.sh: renamed alarm.USER.lock to lock.USER.alarm in order
+    to prevent confusion with a real alarm file
+
+ -- Marco Kühnel <kuehnel@codecivil.de>  Fri, 03 Mar 2023 16:00:00 +0100
+
+alarm-client (1.4-5) UNRELEASED; urgency=low
+
+  [ Marco Kühnel ]
+  * alarm-postinstall.sh: now also installs alarmd for users, so an admin
+    does not have to reinstall the package additionally any more when 
+    adding new users to the machine, just run alarm-postinstall.sh
+  * alarm-postinstall.sh: error message when alarm-central seems to be 
+    missing on CENTRAL
+
+ -- Marco Kühnel <kuehnel@codecivil.de>  Thu, 02 Mar 2023 18:30:00 +0100
+
+alarm-client (1.4-4) UNRELEASED; urgency=low
+
+  [ Marco Kühnel ]
+  * alarm_client.sh: sounds longer than ALARM['DURATION'] played in endless
+    loop (since loop parameter was set to 0)
+
+ -- Marco Kühnel <kuehnel@codecivil.de>  Wed, 01 Mar 2023 13:20:00 +0100
+
+alarm-client (1.4-3) UNRELEASED; urgency=low
+
+  [ Marco Kühnel ]
+  * postinst: repair ownership of .config/autostart and .config/alarm in 
+    user's home
+  * alarm_configurator.sh: make tmp file user dependent, so that several
+    logged in users can configure their alarm settings simultaneously
+
+ -- Marco Kühnel <kuehnel@codecivil.de>  Tue, 24 Jan 2023 14:30:00 +0100
+
+alarm-client (1.4-2) UNRELEASED; urgency=low
+
+  [ Marco Kühnel ]
+  * postinst, alarmd.sh, alarm_configurator.sh: create and use user 
+    configuration file $HOME/.config/alarm/alarm_user.conf for alarm
+    configurator instead of user independent local config (now to be
+    maintained by admin or any alarm user manually)
+
+ -- Marco Kühnel <kuehnel@codecivil.de>  Thu, 24 Nov 2022 10:30:00 +0100
+
+alarm-client (1.4-1) UNRELEASED; urgency=low
+  
+  [ Marco Kühnel ]
+  * alarm-postinstall.sh: use clean up script for authorized keys file 
+    on CENTRAL in order to avoid unnecessarily large key files
+  * added Pachelbel's Canon to audio files
+
+ -- Marco Kühnel <kuehnel@codecivil.de>  Fri, 17 Jun 2022 13:30:00 +0200
+
+alarm-client (1.3-4) UNRELEASED; urgency=low
+  
+  [ Marco Kühnel ]
+  * ignore users with expired passwords; otherwise apt install would enforce password change...
+
+ -- Marco Kühnel <kuehnel@codecivil.de>  Tue, 26 Apr 2022 14:20:00 +0200
+
+alarm-client (1.3-3) UNRELEASED; urgency=low
+  
+  [ Marco Kühnel ]
+  * postinst corrected to "localhost" instead of "127.0.0.1"
+    this broke the usage totally since alarmd.sh stalled at downloading the current config
+
+ -- Marco Kühnel <kuehnel@codecivil.de>  Thu, 14 Oct 2021 09:45:00 +0200
+
+alarm-client (1.3-2) UNRELEASED; urgency=low
+  
+  [ Marco Kühnel ]
+  * ALARM['CENTRAL_ALT'] as list of alternative central IPs; separate variable
+    for backwards compatibility
+
+ -- Marco Kühnel <kuehnel@codecivil.de>  Thu, 14 Oct 2021 09:45:00 +0200
+
+alarm-client (1.2-1) UNRELEASED; urgency=low
+
+  * Added config parameters  as command line options
+
+ -- Marco Kühnel <kuehnel@codecivil.de>  Fri, 30 Oct 2020 13:15:00 +0100
+
+alarm-client (1.1-1) UNRELEASED; urgency=low
+
+  * Separated NOALARM property from ALLCLEAR permissions.
+
+ -- Marco Kühnel <kuehnel@codecivil.de>  Mon, 17 Sep 2018 14:32:31 +0200

@@ -1,0 +1,86 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" (C) Copyright 2017 Marco Kühnel <kuehnel@codecivil.de>,
+.\"
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH alarm-test 8 "March 15, 2025"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+alarm-test \- test components of the alarm system
+.SH SYNOPSIS
+.B alarm-test TYPE ACTION [ARGUMENT|s]
+.br
+.B alarm-test -h|--help
+.br
+.B alarm-test TYPE -h|--help
+.br
+.B alarm-test alarm create|delete|invoke|revoke [BUTTON]
+.br
+.B alarm-test alarm create Message MESSAGETEXT
+.br
+.B alarm-test network self|central|all|<IP>
+.br
+.B alarm-test users show
+.br
+.B alarm-test users add|remove USER
+.br
+.B alarm-test version clean
+
+.SH DESCRIPTION
+alarm-test is a utility to test the main components of alarm-client on a client.
+TYPE describes the component, ACTION the process to test and USER|s may be a space separated list of usernames if applicable.
+.SH OPTIONS
+\fB-h\fP,\fB--help\fP
+shows available TYPEs or ACTIONs dependent on its position.
+.TP
+This describes the available TYPEs and their ACTIONs.
+.TP 
+\fBalarm\fP
+is for testing if the Default alarm or its cancellation triggers the expected behaviour. It has the ACTIONs 
+\fBcreate\fP and \fBdelete\fP for testing the reaction for an incoming request including its distributio to the other nodes! For testing the reacting script
+only the ACTIONs \fBinvoke\fP and \fBrevoke\fP are provided. Called as root or as alarm this also includes the distribution to other nodes. Called by
+a normal alarm user, \fBinvoke\fP and \fBrevoke\fP test the reaction only on the local node. All actions have the button name to be triggered as optional argument.
+Without argument 'Default' is triggered. Given 'Message' as argument on third position, the content of the messsage to be distributed is given by
+the argument(s) on fourth position (and later). 
+.TP
+\fBnetwork\fP
+is for testing if localhost, central nodes or other clients can be reached within the alarm system. It has the ACTIONs 
+\fBself\fP for testing localhost, \fBcentral\fP for testing all central nodes, \fBall\fP for testing all client nodes and the option 
+to give the IP of a client node as ACTION to test its reachability.
+.TP
+\fBusers\fP
+is for listing alarm users and users not registerd to the alarm system as well as adding and removing users to the alarm system.
+It has the ACTIONs \fBshow\fP, \fBadd\fP and \fBremove\fP. \fBadd\fP and \fBremove\fP have to be followed by a space separated list of usernames to apply the action for.
+.TP
+\fBversion\fP
+is for cleaning up remains of older versions in user folders. Its only action is 'clean'.
+.SH EXAMPLES
+.EX
+$ \fBalarm-test\fP alarm create
+.EE
+.EX
+$ \fBalarm-test\fP alarm create Message "Please shutdown immediately"
+.EE
+.EX
+$ \fBalarm-test\fP network central
+.EE
+.EX
+$ \fBalarm-test\fP network 192.168.0.18
+.EE
+.EX
+$ \fBalarm-test\fP users add maxmuster
+.EE
+.SH SEE ALSO
+.BR alarm-client (8).

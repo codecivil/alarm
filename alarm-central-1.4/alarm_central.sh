@@ -13,7 +13,8 @@ ALARM['LOCATION']="${ALARM['LOCATION_FILE']#*alarm.}"
 . /etc/alarm/alarm_local.conf
 
 ALARM['MYIP']="$(ip -4 addr | grep "inet ${ALARM['NETWORK']}" | awk '{print $2; } ' | sed "s/\/.*//; s/${ALARM['NETWORK']}//")"
-[[ "${ALARM['MYIP']}" == "" ]] && ALARM['MYIP']="XXX"
+#256 is better than XXX which would be a message and could lead to an infinite loop
+[[ "${ALARM['MYIP']}" == "" ]] && ALARM['MYIP']="256"
 
  _allstring=""
 for _ip in ${ALARM['ALL']}; do
